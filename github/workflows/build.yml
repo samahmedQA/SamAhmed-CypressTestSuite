@@ -1,0 +1,38 @@
+name: CypressCI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [18, 20]
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          npm install --force
+      # - name: Checkout Dev Repo
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: dipjyotimetia/ExpenseWeb
+      #     path: ExpenseWeb
+
+      # - name: Setup Application under test
+      #   run: docker-compose -f ExpenseWeb/docker-compose.yml up -d
+
+      - name: Cypress & Percy visual test
+        # uses: cypress-io/github-action@v2.9.12
+        # with:
+        #   # command: "cypress run --spec 'cypress/integration/example_spec.js' --record --key=${{ secrets.CYPRESS_TOKEN }}"
+        #   spec: cypress/integration/example_spec.ts
+        uses: percy/exec-action@v0.3.1
+        with:
+          custom-command: "npm test"
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
